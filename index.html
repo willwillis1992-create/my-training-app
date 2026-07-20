@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Training App</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Training App">
+<meta name="theme-color" content="#f5f5f0">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;padding:16px;max-width:480px;margin:0 auto;padding-bottom:40px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.subtitle{font-size:12px;color:#888;margin-bottom:16px}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.metric{background:#fff;border-radius:12px;padding:12px;text-align:center;border:0.5px solid #e0e0d8}
+.metric-val{font-size:18px;font-weight:600;color:#1a1a1a}
+.metric-lbl{font-size:10px;color:#888;margin-top:2px}
+.tabs{display:flex;gap:3px;background:#e8e8e0;border-radius:12px;padding:4px;margin-bottom:16px}
+.tab{flex:1;padding:8px 0;font-size:11px;border:none;background:transparent;color:#888;border-radius:9px;cursor:pointer;font-weight:400;transition:all .15s}
+.tab.active{background:#fff;color:#1a1a1a;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.section{display:none}.section.active{display:block}
+.card{background:#fff;border:0.5px solid #e0e0d8;border-radius:14px;padding:14px;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.card-sub{font-size:12px;color:#888}
+.badge{display:inline-block;font-size:10px;padding:3px 8px;border-radius:8px;font-weight:600}
+.b-blue{background:#deeefb;color:#1a5fa0}
+.b-green{background:#e3f5d8;color:#3a6d10}
+.b-amber{background:#faecd8;color:#8a5010}
+.b-gray{background:#f0f0e8;color:#666}
+.b-red{background:#fce8e8;color:#a02020}
+.b-purple{background:#ede8fb;color:#5020a0}
+.btn{padding:9px 14px;border-radius:10px;border:0.5px solid #ccc;background:#fff;color:#333;font-size:12px;cursor:pointer;font-weight:500}
+.btn-green{background:#3a6d10;color:#fff;border-color:#3a6d10}
+.btn-blue{background:#1a5fa0;color:#fff;border-color:#1a5fa0}
+.btn-red{color:#a02020;border-color:#d84040}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:8px}
+.action-row{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.banner{border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.ban-amber{background:#faecd8;border:0.5px solid #e09020;color:#6b3d08}
+.ban-green{background:#e3f5d8;border:0.5px solid #5a9e2f;color:#2a5008}
+.ban-red{background:#fce8e8;border:0.5px solid #d84040;color:#701818}
+.ban-blue{background:#deeefb;border:0.5px solid #2e7dd1;color:#0a3a6b}
+.ban-purple{background:#ede8fb;border:0.5px solid #7050c0;color:#3a1880}
+.divider{border:none;border-top:0.5px solid #e8e8e0;margin:10px 0}
+.note{font-size:11px;color:#888;line-height:1.6;margin-top:8px}
+select{width:100%;margin-top:6px;padding:9px 10px;border-radius:10px;border:0.5px solid #ccc;background:#fff;color:#333;font-size:13px;appearance:none;-webkit-appearance:none}
+
+/* WEEK CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav button{background:none;border:none;font-size:20px;cursor:pointer;color:#888;padding:4px 8px}
+.cal-nav span{font-size:13px;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-dow{font-size:9px;color:#aaa;text-align:center;padding-bottom:3px;font-weight:600}
+.cal-day{border-radius:8px;padding:5px 2px;text-align:center;cursor:pointer;min-height:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#333;border:0.5px solid transparent}
+.cal-day.empty{cursor:default}
+.cal-day.today-cal{border:1.5px solid #2e7dd1;font-weight:700}
+.cal-day.has-strength{background:#deeefb}
+.cal-day.has-cardio{background:#e3f5d8}
+.cal-day.has-both{background:linear-gradient(135deg,#deeefb 50%,#e3f5d8 50%)}
+.cal-day.missed-day{background:#fce8e8}
+.cal-dot{width:5px;height:5px;border-radius:50%;margin-top:2px}
+.dot-blue{background:#2e7dd1}
+.dot-green{background:#3a6d10}
+.dot-red{background:#d84040}
+
+/* EXERCISE TRACKER */
+.ex-track-item{border:0.5px solid #e0e0d8;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.ex-track-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fafaf8;cursor:pointer}
+.ex-track-name{font-size:13px;font-weight:600}
+.ex-track-sub{font-size:11px;color:#888;margin-top:1px}
+.ex-track-body{padding:10px 12px;border-top:0.5px solid #f0f0e8;display:none}
+.ex-track-body.open{display:block}
+.set-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.set-label{font-size:11px;color:#888;width:30px}
+.set-input{flex:1;padding:7px 8px;border-radius:8px;border:0.5px solid #ccc;font-size:13px;text-align:center;background:#fff}
+.set-input:focus{outline:none;border-color:#2e7dd1}
+.set-status{width:24px;text-align:center;font-size:14px}
+.suggest-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:6px 8px;background:#f5f5f0;border-radius:8px}
+.suggest-lbl{font-size:11px;color:#666}
+.suggest-val{font-size:12px;font-weight:600;color:#1a5fa0}
+.progress-mini{display:flex;align-items:center;gap:6px;margin-top:6px}
+.prog-bar-wrap{flex:1;background:#e8e8e0;border-radius:4px;height:5px;overflow:hidden}
+.prog-bar{height:5px;border-radius:4px;background:#2e7dd1;transition:width .3s}
+.prog-lbl{font-size:10px;color:#888;white-space:nowrap}
+
+/* HISTORY / PROGRESS */
+.history-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid #f0f0e8}
+.history-item:last-child{border-bottom:none}
+.history-date{font-size:10px;color:#888;white-space:nowrap;min-width:50px;padding-top:2px}
+.history-body{flex:1}
+.history-title{font-size:13px;font-weight:600}
+.history-detail{font-size:11px;color:#666;margin-top:2px;line-height:1.6}
+.streak-bar{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
+.streak-dot{width:12px;height:12px;border-radius:3px}
+
+/* MEAL CARDS */
+.meal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.meal-name{font-size:13px;font-weight:600}
+.macro-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.macro{font-size:10px;padding:2px 7px;border-radius:7px;background:#f0f0e8;color:#666}
+.prep-tag{font-size:10px;background:#e3f5d8;color:#3a6d10;padding:2px 7px;border-radius:7px;font-weight:500}
+.prep-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.prep-time{border-radius:8px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.step-title{font-size:13px;font-weight:600;color:#1a1a1a}
+.step-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.5}
+
+/* PROGRESS CHART */
+.chart-wrap{overflow-x:auto;padding-bottom:4px}
+.chart-svg{min-width:300px}
+</style>
+</head>
+<body>
+
+<h1>Your fitness plan</h1>
+<p class="subtitle">33M · strength & definition · slight calorie deficit</p>
+
+<div class="metric-grid">
+  <div class="metric"><div class="metric-val" id="m-sessions">0</div><div class="metric-lbl">sessions logged</div></div>
+  <div class="metric"><div class="metric-val" id="m-streak">0</div><div class="metric-lbl">week streak 🔥</div></div>
+  <div class="metric"><div class="metric-val" id="m-weekly-km">0</div><div class="metric-lbl">km this week 🏃</div></div>
+  <div class="metric"><div class="metric-val">~2,500</div><div class="metric-lbl">daily kcal</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('calendar',this)"><i class="ti ti-calendar"></i> Cal</button>
+  <button class="tab" onclick="switchTab('workout',this)"><i class="ti ti-barbell"></i> Train</button>
+  <button class="tab" onclick="switchTab('cardio',this)"><i class="ti ti-run"></i> Run</button>
+  <button class="tab" onclick="switchTab('progress',this)"><i class="ti ti-chart-line"></i> Stats</button>
+  <button class="tab" onclick="switchTab('diet',this)"><i class="ti ti-salad"></i> Diet</button>
+  <button class="tab" onclick="switchTab('prep',this)"><i class="ti ti-chef-hat"></i> Prep</button>
+</div>
+
+<!-- CALENDAR -->
+<div id="section-calendar" class="section active">
+  <div class="card">
+    <div class="cal-nav">
+      <button onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+      <span id="cal-title"></span>
+      <button onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="cal-grid" id="cal-dow"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:10px;color:#666"><span style="display:inline-block;width:10px;height:10px;background:#deeefb;border-radius:2px;margin-right:3px"></span>Strength</span>
+      <span style="font-size:10px;color:#666"><span style="display:inline-block;width:10px;height:10px;background:#e3f5d8;border-radius:2px;margin-right:3px"></span>Cardio</span>
+      <span style="font-size:10px;color:#666"><span style="display:inline-block;width:10px;height:10px;background:#fce8e8;border-radius:2px;margin-right:3px"></span>Missed</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:8px">Training streak</div>
+    <div id="streak-display"></div>
+    <div id="streak-bar" class="streak-bar" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- TRAIN -->
+<div id="section-workout" class="section">
+  <div style="margin-bottom:12px">
+    <div style="font-size:12px;color:#888">Select session:</div>
+    <select id="session-select" onchange="renderSession()">
+      <option value="push">Monday — Push (chest, shoulders, triceps)</option>
+      <option value="pull">Wednesday — Pull (back, biceps, rear delts)</option>
+      <option value="legs">Friday — Legs (quads, hamstrings, glutes)</option>
+    </select>
+  </div>
+  <div id="session-header"></div>
+  <div id="exercise-tracker"></div>
+  <div id="session-actions" style="margin-top:4px"></div>
+</div>
+
+<!-- CARDIO -->
+<div id="section-cardio" class="section">
+  <div class="card">
+    <div class="card-title" style="margin-bottom:10px">Log a run</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Date</div>
+        <input id="run-date" type="date" style="width:100%;padding:8px 10px;border-radius:10px;border:0.5px solid #ccc;font-size:13px;background:#fff;color:#333">
+      </div>
+      <div>
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Run type</div>
+        <select id="run-type" style="margin-top:0">
+          <option value="commute">Commute</option>
+          <option value="easy">Easy run</option>
+          <option value="long">Long run</option>
+          <option value="tempo">Tempo / intervals</option>
+          <option value="cycle">Cycle commute</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Distance (km)</div>
+        <input id="run-km" type="number" step="0.1" placeholder="e.g. 10.5" style="width:100%;padding:8px 10px;border-radius:10px;border:0.5px solid #ccc;font-size:13px;background:#fff;color:#333">
+      </div>
+      <div>
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Time (min)</div>
+        <input id="run-mins" type="number" placeholder="e.g. 55" style="width:100%;padding:8px 10px;border-radius:10px;border:0.5px solid #ccc;font-size:13px;background:#fff;color:#333">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">Notes (optional)</div>
+      <input id="run-notes" type="text" placeholder="e.g. felt strong, hilly route..." style="width:100%;padding:8px 10px;border-radius:10px;border:0.5px solid #ccc;font-size:13px;background:#fff;color:#333">
+    </div>
+    <div id="run-pace-preview" style="font-size:12px;color:#888;margin-bottom:10px;min-height:18px"></div>
+    <button class="btn btn-green" style="width:100%" onclick="logRun()"><i class="ti ti-check"></i> Save run</button>
+    <div id="run-confirm" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:4px">This week's running</div>
+    <div id="weekly-run-summary"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:8px">Recent runs</div>
+    <div id="run-history"></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="section-progress" class="section">
+  <div style="display:flex;gap:6px;margin-bottom:12px">
+    <button class="btn btn-blue btn-sm" id="prog-tab-strength" onclick="switchProgressTab('strength')">💪 Strength</button>
+    <button class="btn btn-sm" id="prog-tab-running" onclick="switchProgressTab('running')" style="background:#e3f5d8;color:#2a5008;border-color:#5a9e2f">🏃 Running</button>
+  </div>
+
+  <div id="prog-strength">
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;color:#888">View progress for:</div>
+      <select id="progress-ex-select" onchange="renderProgress()">
+        <option value="">— select an exercise —</option>
+      </select>
+    </div>
+    <div id="progress-chart"></div>
+    <div class="card" style="margin-top:12px">
+      <div class="card-title" style="margin-bottom:8px">Session history</div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <div id="prog-running" style="display:none">
+    <div id="running-weekly-chart"></div>
+    <div class="card" style="margin-top:12px">
+      <div class="card-title" style="margin-bottom:8px">Run history</div>
+      <div id="running-history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DIET -->
+<div id="section-diet" class="section">
+  <div class="card">
+    <div class="card-title">Daily targets</div>
+    <p style="font-size:12px;color:#888;margin-top:4px;line-height:1.6">High cardio volume means a modest 200–300 kcal deficit is enough to lean out without hurting run performance.</p>
+    <div class="divider"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+      <div><span style="color:#888">Calories</span><br><b style="font-size:14px">~2,500 kcal</b></div>
+      <div><span style="color:#888">Protein</span><br><b style="font-size:14px">175g (~2g/kg)</b></div>
+      <div><span style="color:#888">Carbs</span><br><b style="font-size:14px">260g</b></div>
+      <div><span style="color:#888">Fats</span><br><b style="font-size:14px">70g</b></div>
+    </div>
+  </div>
+  <div class="card"><div class="meal-header"><span class="meal-name">Breakfast</span><span class="badge b-amber">7:00 am</span></div><div style="font-size:12px;color:#666">Overnight oats (80g), banana, 30g whey, 200ml oat milk</div><div class="macro-row"><span class="macro">~550 kcal</span><span class="macro">40g protein</span><span class="macro">75g carbs</span><span class="prep-tag">prep night before</span></div></div>
+  <div class="card"><div class="meal-header"><span class="meal-name">Mid-morning snack</span><span class="badge b-gray">10:30 am</span></div><div style="font-size:12px;color:#666">Greek yoghurt (200g) + mixed nuts (almonds/pistachios) + berries</div><div class="macro-row"><span class="macro">~380 kcal</span><span class="macro">22g protein</span><span class="macro">24g fat</span></div></div>
+  <div class="card"><div class="meal-header"><span class="meal-name">Lunch</span><span class="badge b-green">1:00 pm</span></div><div style="font-size:12px;color:#666">Ground beef & sweet potato bowl + roasted veg + lemon dressing</div><div class="macro-row"><span class="macro">~640 kcal</span><span class="macro">48g protein</span><span class="macro">55g carbs</span><span class="macro">22g fat</span><span class="prep-tag">prepped Sunday</span></div></div>
+  <div class="card"><div class="meal-header"><span class="meal-name">Pre-workout snack</span><span class="badge b-blue">5:00 pm</span></div><div style="font-size:12px;color:#666">3 rice cakes + peanut butter + banana</div><div class="macro-row"><span class="macro">~350 kcal</span><span class="macro">10g protein</span><span class="macro">48g carbs</span></div></div>
+  <div class="card"><div class="meal-header"><span class="meal-name">Dinner</span><span class="badge b-blue">7:30 pm</span></div><div style="font-size:12px;color:#666">Salmon + sweet potato + broccoli + spinach</div><div class="macro-row"><span class="macro">~600 kcal</span><span class="macro">45g protein</span><span class="macro">54g carbs</span><span class="macro">18g fat</span></div></div>
+  <p class="note">On rest/run-only days: drop ~250 kcal and ~60g carbs. Keep protein constant. Aim for 3L+ water on run days.</p>
+</div>
+
+<!-- MEAL PREP -->
+<div id="section-prep" class="section">
+  <div class="card">
+    <div class="card-title">Sunday prep <span style="font-weight:400;font-size:12px;color:#888">~1 hour</span></div>
+    <p style="font-size:12px;color:#888;margin-top:4px;margin-bottom:12px">Covers 5 lunches, 5 breakfasts & snacks. Steps run in parallel.</p>
+    <div class="prep-step"><div class="prep-time" style="background:#deeefb;color:#1a5fa0">0:00</div><div><div class="step-title">Roast veg (passive)</div><div class="step-desc">Sheet-pan veg (courgette, peppers, tomatoes) at 200°C, 25 min. Cooks itself while you do the rest.</div></div></div>
+    <div class="prep-step"><div class="prep-time" style="background:#e3f5d8;color:#3a6d10">0:10</div><div><div class="step-title">Ground beef + sweet potatoes</div><div class="step-desc">Brown 500g beef with garlic, paprika, cumin, salt. Cube & roast sweet potatoes at 200°C 25 min alongside veg.</div></div></div>
+    <div class="prep-step"><div class="prep-time" style="background:#faecd8;color:#8a5010">0:35</div><div><div class="step-title">Assemble 5 lunch boxes</div><div class="step-desc">200g sweet potato + 100g beef + veg per box. Small dressing pot on side. Fridge 4 days, freeze 1.</div></div></div>
+    <div class="prep-step"><div class="prep-time" style="background:#fbe8f0;color:#7a2040">0:45</div><div><div class="step-title">Overnight oats × 5</div><div class="step-desc">5 jars: 80g oats + 200ml oat milk + 1 scoop whey + chia seeds. Add banana fresh each morning.</div></div></div>
+    <div class="prep-step"><div class="prep-time" style="background:#f0f0e8;color:#666">0:55</div><div><div class="step-title">Pack snacks</div><div class="step-desc">5 × 30g nut bags (almonds/pistachios). 5 × 200g Greek yoghurt tubs. Done.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:8px">Shopping essentials</div>
+    <div style="font-size:12px;color:#666;line-height:2.1">500g lean ground beef · 2 salmon fillets · Greek yoghurt 500g · oats 500g · whey protein · 4 sweet potatoes · courgette, peppers, cherry tomatoes · bananas ×7 · almonds/pistachios 150g · oat milk · rice cakes · peanut butter</div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────
+const STORE_KEY = 'willFitnessV2';
+
+const SESSIONS_DEF = {
+  push:{
+    title:'Push', sub:'Mon · 45 min · chest, shoulders, triceps',
+    badge:'b-blue', bt:'Push',
+    wu:'5 min: arm circles, cable face pulls (light), push-up progressions',
+    exercises:[
+      {id:'chest_press',    n:'Chest press machine',           s:'4',reps:'8–10', startKg:40, note:'✅ Safe to failure — rack it. 3-0-1 tempo'},
+      {id:'pec_deck',       n:'Pec deck / fly machine',        s:'4',reps:'12',   startKg:30, note:'✅ Safe to failure — slow eccentric'},
+      {id:'smith_shoulder', n:'Smith machine shoulder press',  s:'3',reps:'10–12',startKg:30, note:'✅ Safe to failure — bar guided, brace core'},
+      {id:'cable_lateral',  n:'Cable lateral raise',           s:'3',reps:'15 ea',startKg:8,  note:'✅ Safe to failure — single arm, constant tension'},
+      {id:'cable_pushdown', n:'Cable tricep pushdown',         s:'3',reps:'12',   startKg:20, note:'✅ Safe to failure — rope or bar attachment'},
+      {id:'cable_tri_oh',   n:'Cable overhead tricep ext.',    s:'3',reps:'12',   startKg:15, note:'✅ Safe to failure — face away from stack'},
+      {id:'db_lateral_ds',  n:'DB lateral raise (drop set)',   s:'2',reps:'15→10',startKg:8,  note:'⚠️ Stop 1 rep short of failure, drop weight each set'},
+    ],
+    cd:'5 min: chest doorway stretch, tricep overhead, shoulder cross-body'
+  },
+  pull:{
+    title:'Pull', sub:'Wed · 45 min · back, biceps, rear delts',
+    badge:'b-green', bt:'Pull',
+    wu:'5 min: scapular retractions, light cable row, arm swings',
+    exercises:[
+      {id:'lat_pulldown',   n:'Lat pulldown',                  s:'4',reps:'10',   startKg:50, note:'✅ Safe to failure — wide grip, pull to upper chest'},
+      {id:'seated_row',     n:'Seated cable row',              s:'4',reps:'10',   startKg:45, note:'✅ Safe to failure — neutral grip, squeeze blades'},
+      {id:'face_pull',      n:'Cable face pull',               s:'3',reps:'15',   startKg:15, note:'✅ Safe to failure — rope, pull to forehead'},
+      {id:'single_row',     n:'Single-arm cable row',          s:'3',reps:'12 ea',startKg:20, note:'✅ Safe to failure — rotate torso, full stretch'},
+      {id:'cable_curl',     n:'Cable curl',                    s:'3',reps:'12',   startKg:20, note:'✅ Safe to failure — EZ bar, constant tension'},
+      {id:'cable_hammer',   n:'Cable hammer curl',             s:'3',reps:'12 ea',startKg:12, note:'✅ Safe to failure — rope attachment, neutral grip'},
+      {id:'db_shrug',       n:'DB shrug',                      s:'3',reps:'15',   startKg:20, note:'⚠️ Stop 1 rep short of failure, hold 1s at top'},
+    ],
+    cd:'5 min: lat stretch overhead, bicep wall stretch, thoracic rotation'
+  },
+  legs:{
+    title:'Legs', sub:'Fri · 45 min · quads, hamstrings, glutes',
+    badge:'b-amber', bt:'Legs',
+    wu:'5 min: glute bridges, leg swings, bodyweight squats',
+    exercises:[
+      {id:'leg_press',      n:'Leg press',                     s:'4',reps:'10–12',startKg:80, note:'✅ Safe to failure — never lock knees at top'},
+      {id:'leg_ext',        n:'Leg extension',                 s:'4',reps:'12',   startKg:40, note:'✅ Safe to failure — pause 1s at top'},
+      {id:'leg_curl',       n:'Leg curl (seated/lying)',        s:'4',reps:'12',   startKg:35, note:'✅ Safe to failure — slow eccentric'},
+      {id:'smith_squat',    n:'Smith machine squat',           s:'3',reps:'10',   startKg:40, note:'✅ Safe to failure — feet slightly forward'},
+      {id:'smith_rdl',      n:'Smith machine Romanian DL',     s:'3',reps:'10',   startKg:40, note:'✅ Safe to failure — hinge, feel hamstring stretch'},
+      {id:'cable_pullthru', n:'Cable pull-through',            s:'3',reps:'15',   startKg:25, note:'✅ Safe to failure — glute focus, hinge not squat'},
+      {id:'calf_smith',     n:'Single-leg calf raise (Smith)', s:'3',reps:'15 ea',startKg:20, note:'✅ Safe to failure — Smith bar for support & load'},
+    ],
+    cd:'5 min: hip flexor, pigeon pose, quad stretch, calf stretch'
+  }
+};
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────
+function loadData(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY))||initData(); }
+  catch(e){ return initData(); }
+}
+function initData(){
+  return { sessions:[], weights:{}, lastSeen:{} };
+}
+function saveData(d){ localStorage.setItem(STORE_KEY, JSON.stringify(d)); }
+let DB = loadData();
+
+// ─── WEIGHT LOGIC ────────────────────────────────────────────────────────
+// Returns suggested weight for an exercise based on history + recency
+function suggestWeight(exId, startKg){
+  const history = (DB.sessions || [])
+    .filter(s => s.exercises && s.exercises[exId])
+    .map(s => ({ date: s.date, ...s.exercises[exId] }))
+    .sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  if(!history.length) return { kg: startKg, reason:'Starting weight', trend:'new' };
+
+  const last = history[0];
+  const daysSince = Math.floor((Date.now()-new Date(last.date))/(1000*60*60*24));
+  const completedSets = last.sets ? last.sets.filter(s=>s.completed).length : 0;
+  const totalSets = last.sets ? last.sets.length : 0;
+  const allComplete = completedSets === totalSets && totalSets > 0;
+
+  // Deload logic: if >14 days, drop 10%; >21 days, drop 15%
+  if(daysSince > 21){
+    const deload = Math.round(last.kg * 0.85 / 2.5) * 2.5;
+    return { kg: deload, reason:`${daysSince}d gap — deload -15%`, trend:'down' };
+  }
+  if(daysSince > 14){
+    const deload = Math.round(last.kg * 0.90 / 2.5) * 2.5;
+    return { kg: deload, reason:`${daysSince}d gap — deload -10%`, trend:'down' };
+  }
+
+  // Progressive overload: if all sets completed last time, nudge up 2.5kg
+  if(allComplete && history.length >= 1){
+    // Check if increased last session too — don't increase more than 2 in a row
+    const prevKg = history.length > 1 ? history[1].kg : null;
+    if(prevKg && prevKg < last.kg){
+      // Already increased once — hold weight, wait for another completion
+      return { kg: last.kg, reason:'Hold — consolidate weight', trend:'hold' };
+    }
+    const up = last.kg + 2.5;
+    return { kg: up, reason:'All sets done — +2.5kg 💪', trend:'up' };
+  }
+
+  return { kg: last.kg, reason:'Continue from last session', trend:'hold' };
+}
+
+// ─── CALENDAR ────────────────────────────────────────────────────────────
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function changeMonth(dir){
+  calMonth += dir;
+  if(calMonth > 11){ calMonth=0; calYear++; }
+  if(calMonth < 0){ calMonth=11; calYear--; }
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-title').textContent = `${months[calMonth]} ${calYear}`;
+
+  const dow = document.getElementById('cal-dow');
+  dow.innerHTML = ['M','T','W','T','F','S','S'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  const first = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const startOffset = (first===0?6:first-1); // Mon-based
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+
+  // Build session lookup by date string
+  const sessionMap = {};
+  (DB.sessions||[]).forEach(s=>{
+    if(!sessionMap[s.date]) sessionMap[s.date]=[];
+    sessionMap[s.date].push(s.type);
+  });
+  (DB.runs||[]).forEach(r=>{
+    if(!sessionMap[r.date]) sessionMap[r.date]=[];
+    sessionMap[r.date].push('run');
+  });
+
+  for(let i=0;i<startOffset;i++){
+    const el=document.createElement('div');
+    el.className='cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const el=document.createElement('div');
+    const isToday = (d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear());
+    const types = sessionMap[dateStr]||[];
+    const hasStrength = types.some(t=>['push','pull','legs'].includes(t));
+    const hasCardio = types.some(t=>t==='run');
+    const hasMissed = types.some(t=>t==='missed');
+
+    let cls='cal-day';
+    if(isToday) cls+=' today-cal';
+    if(hasMissed) cls+=' missed-day';
+    else if(hasStrength&&hasCardio) cls+=' has-both';
+    else if(hasStrength) cls+=' has-strength';
+    else if(hasCardio) cls+=' has-cardio';
+
+    el.className=cls;
+    el.innerHTML=`<span>${d}</span>`;
+    if(types.length){
+      const dot=document.createElement('div');
+      dot.className='cal-dot '+(hasMissed?'dot-red':hasStrength?'dot-blue':'dot-green');
+      el.appendChild(dot);
+    }
+    el.onclick=()=>showDayDetail(dateStr, types);
+    grid.appendChild(el);
+  }
+  renderStreak();
+}
+
+function showDayDetail(dateStr, types){
+  if(!types.length) return;
+  const sessions = (DB.sessions||[]).filter(s=>s.date===dateStr);
+  let msg = `<b>${dateStr}</b><br>`;
+  sessions.forEach(s=>{
+    msg += `${s.type.toUpperCase()}: `;
+    if(s.exercises){
+      const exNames = Object.keys(s.exercises);
+      msg += exNames.map(k=>{
+        const ex=s.exercises[k];
+        return `${k.replace(/_/g,' ')} ${ex.kg}kg`;
+      }).join(', ');
+    }
+    msg += '<br>';
+  });
+  const b = document.createElement('div');
+  b.className='banner ban-blue';
+  b.style.marginBottom='12px';
+  b.innerHTML=`<i class="ti ti-info-circle"></i><span>${msg}</span>`;
+  // Show at top of calendar section
+  const sec = document.getElementById('section-calendar');
+  const existing = sec.querySelector('.day-detail-banner');
+  if(existing) existing.remove();
+  b.classList.add('day-detail-banner');
+  sec.insertBefore(b, sec.firstChild);
+}
+
+function renderStreak(){
+  // Count consecutive weeks with at least 1 strength session
+  const sessionsByWeek = {};
+  (DB.sessions||[]).filter(s=>['push','pull','legs'].includes(s.type)).forEach(s=>{
+    const d=new Date(s.date);
+    const weekKey = `${d.getFullYear()}-W${getWeek(d)}`;
+    sessionsByWeek[weekKey]=true;
+  });
+
+  const weeks = Object.keys(sessionsByWeek).sort().reverse();
+  let streak=0;
+  const now=new Date();
+  let checkDate=new Date(now);
+  // Allow current week to count even if not finished
+  for(let i=0;i<52;i++){
+    const wk=`${checkDate.getFullYear()}-W${getWeek(checkDate)}`;
+    if(sessionsByWeek[wk]){ streak++; checkDate.setDate(checkDate.getDate()-7); }
+    else if(i===0){ checkDate.setDate(checkDate.getDate()-7); } // grace for current week
+    else break;
+  }
+
+  document.getElementById('m-streak').textContent = streak;
+  document.getElementById('m-sessions').textContent = (DB.sessions||[]).filter(s=>['push','pull','legs'].includes(s.type)).length;
+  // Weekly km
+  const nowW=new Date(), dowW=nowW.getDay()===0?6:nowW.getDay()-1;
+  const wkStart=new Date(nowW); wkStart.setDate(nowW.getDate()-dowW); wkStart.setHours(0,0,0,0);
+  const wkEnd=new Date(wkStart); wkEnd.setDate(wkStart.getDate()+6); wkEnd.setHours(23,59,59,999);
+  const wkKm=(DB.runs||[]).filter(r=>{ const d=new Date(r.date); return d>=wkStart&&d<=wkEnd; }).reduce((a,r)=>a+r.km,0);
+  const kmEl=document.getElementById('m-weekly-km');
+  if(kmEl) kmEl.textContent=wkKm.toFixed(1);
+
+  // Streak display
+  const last12 = [];
+  const d=new Date(now);
+  for(let i=11;i>=0;i--){
+    const nd=new Date(d); nd.setDate(nd.getDate()-i*7);
+    const wk=`${nd.getFullYear()}-W${getWeek(nd)}`;
+    last12.push({wk, active:!!sessionsByWeek[wk]});
+  }
+  const bar=document.getElementById('streak-bar');
+  bar.innerHTML=last12.map(w=>`<div class="streak-dot" title="${w.wk}" style="background:${w.active?'#2e7dd1':'#e0e0d8'}"></div>`).join('');
+  document.getElementById('streak-display').innerHTML=`<span style="font-size:13px;color:#666">${streak > 0 ? `<b style="color:#1a1a1a;font-size:16px">${streak}</b> consecutive week${streak!==1?'s':''} with strength training` : 'No streak yet — log your first session!'}</span>`;
+}
+
+function getWeek(d){
+  const onejan=new Date(d.getFullYear(),0,1);
+  return Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+}
+
+// ─── SESSION / EXERCISE TRACKER ──────────────────────────────────────────
+let activeSession = null; // {key, exercises: {exId: {sets:[{kg,reps,completed}]}}}
+
+function renderSession(){
+  const k = document.getElementById('session-select').value;
+  const s = SESSIONS_DEF[k];
+  activeSession = { key:k, date: todayStr(), exercises:{} };
+
+  // Header
+  document.getElementById('session-header').innerHTML=`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="card-title">${s.title}</div><div class="card-sub">${s.sub}</div></div>
+        <span class="badge ${s.badge}">${s.bt}</span>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:8px"><b style="color:#333">Warm-up:</b> ${s.wu}</div>
+    </div>`;
+
+  // Check days since last this session type
+  const lastSession = (DB.sessions||[]).filter(ss=>ss.type===k).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+  let adaptBanner='';
+  if(lastSession){
+    const days=Math.floor((Date.now()-new Date(lastSession.date))/(1000*60*60*24));
+    if(days>21) adaptBanner=`<div class="banner ban-red"><i class="ti ti-alert-triangle"></i> ${days} days since last ${s.title} session — weights auto-deloaded by 15%.</div>`;
+    else if(days>14) adaptBanner=`<div class="banner ban-amber"><i class="ti ti-alert-triangle"></i> ${days} days since last ${s.title} session — weights deloaded by 10%.</div>`;
+    else if(days<=7) adaptBanner=`<div class="banner ban-green"><i class="ti ti-check"></i> On schedule — ${days}d since last ${s.title}. Keep it up!</div>`;
+  } else {
+    adaptBanner=`<div class="banner ban-blue"><i class="ti ti-info-circle"></i> First time logging ${s.title}! Starting weights are suggestions — adjust to what feels right.</div>`;
+  }
+
+  // Build exercise tracker
+  let html = adaptBanner;
+  s.exercises.forEach(ex=>{
+    const suggest = suggestWeight(ex.id, ex.startKg);
+    const numSets = parseInt(ex.s);
+    const trendIcon = suggest.trend==='up'?'📈':suggest.trend==='down'?'📉':suggest.trend==='new'?'🆕':'➡️';
+    const trendColor = suggest.trend==='up'?'#2a5008':suggest.trend==='down'?'#701818':'#444';
+
+    let setsHtml='';
+    for(let i=0;i<numSets;i++){
+      setsHtml+=`
+        <div class="set-row" id="setrow-${ex.id}-${i}">
+          <span class="set-label">Set ${i+1}</span>
+          <input class="set-input" type="number" step="2.5" value="${suggest.kg}" id="kg-${ex.id}-${i}" placeholder="kg" style="max-width:70px" onchange="updateSet('${ex.id}',${i})">
+          <span style="font-size:11px;color:#888">kg</span>
+          <input class="set-input" type="number" value="" id="reps-${ex.id}-${i}" placeholder="${ex.reps}" style="max-width:60px" onchange="updateSet('${ex.id}',${i})">
+          <span style="font-size:11px;color:#888">reps</span>
+          <span class="set-status" id="status-${ex.id}-${i}" onclick="toggleSet('${ex.id}',${i})" style="cursor:pointer;font-size:18px">○</span>
+        </div>`;
+    }
+
+    html+=`
+      <div class="ex-track-item">
+        <div class="ex-track-header" onclick="toggleExBody('${ex.id}')">
+          <div>
+            <div class="ex-track-name">${ex.n}</div>
+            <div class="ex-track-sub">${ex.s} sets · ${ex.reps} reps · <span style="color:${trendColor}">${trendIcon} ${suggest.kg}kg suggested</span></div>
+          </div>
+          <i class="ti ti-chevron-down" id="chevron-${ex.id}" style="color:#aaa;transition:transform .2s"></i>
+        </div>
+        <div class="ex-track-body" id="body-${ex.id}">
+          <div class="suggest-row">
+            <span class="suggest-lbl">Suggested weight</span>
+            <span class="suggest-val">${trendIcon} ${suggest.kg}kg — <span style="font-weight:400;color:#888">${suggest.reason}</span></span>
+          </div>
+          <div style="font-size:10px;color:#aaa;margin-bottom:8px">${ex.note}</div>
+          ${setsHtml}
+          <div id="ex-progress-${ex.id}" style="margin-top:6px"></div>
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('exercise-tracker').innerHTML=html;
+
+  document.getElementById('session-actions').innerHTML=`
+    <div class="action-row">
+      <button class="btn btn-green" onclick="completeSession()"><i class="ti ti-check"></i> Save session</button>
+      <button class="btn btn-red" onclick="missedSession()"><i class="ti ti-x"></i> Missed it</button>
+    </div>
+    <p class="note" style="margin-top:8px">Tap ○ next to each set to mark it complete. Weights auto-suggest based on your history.</p>`;
+}
+
+function toggleExBody(exId){
+  const body=document.getElementById('body-'+exId);
+  const chev=document.getElementById('chevron-'+exId);
+  body.classList.toggle('open');
+  chev.style.transform=body.classList.contains('open')?'rotate(180deg)':'';
+}
+
+function updateSet(exId, setIdx){
+  // Just reads — actual saving happens on completeSession
+}
+
+function toggleSet(exId, setIdx){
+  const statusEl=document.getElementById(`status-${exId}-${setIdx}`);
+  const row=document.getElementById(`setrow-${exId}-${setIdx}`);
+  const done=statusEl.textContent==='✅';
+  statusEl.textContent=done?'○':'✅';
+  row.style.background=done?'':'#f0faf0';
+  row.style.borderRadius=done?'':'8px';
+}
+
+function gatherSessionData(){
+  const s=SESSIONS_DEF[activeSession.key];
+  const exData={};
+  s.exercises.forEach(ex=>{
+    const numSets=parseInt(ex.s);
+    const sets=[];
+    let lastKg=ex.startKg;
+    for(let i=0;i<numSets;i++){
+      const kgEl=document.getElementById(`kg-${ex.id}-${i}`);
+      const repsEl=document.getElementById(`reps-${ex.id}-${i}`);
+      const statusEl=document.getElementById(`status-${ex.id}-${i}`);
+      const kg=parseFloat(kgEl?.value)||lastKg;
+      lastKg=kg;
+      sets.push({ kg, reps:parseInt(repsEl?.value)||0, completed:statusEl?.textContent==='✅' });
+    }
+    // Primary kg = most common or first
+    exData[ex.id]={ kg: sets[0]?.kg||ex.startKg, sets };
+  });
+  return exData;
+}
+
+function completeSession(){
+  const exData=gatherSessionData();
+  const session={
+    date: todayStr(),
+    type: activeSession.key,
+    exercises: exData,
+    completedAt: new Date().toISOString()
+  };
+  DB.sessions.push(session);
+  saveData(DB);
+
+  // Show confirmation with summary
+  const totalSets=Object.values(exData).reduce((a,ex)=>a+ex.sets.filter(s=>s.completed).length,0);
+  document.getElementById('session-actions').innerHTML=`
+    <div class="banner ban-green"><i class="ti ti-circle-check"></i> Session saved! ${totalSets} sets logged. Eat protein within 30 min 💪</div>
+    <div class="banner ban-blue" style="margin-top:4px"><i class="ti ti-chart-line"></i> Check the Progress tab to see your trends.</div>`;
+  updateProgressSelect();
+  renderCalendar();
+}
+
+function missedSession(){
+  DB.sessions.push({ date:todayStr(), type:'missed', exercises:{} });
+  saveData(DB);
+  document.getElementById('session-actions').innerHTML=`<div class="banner ban-red"><i class="ti ti-alert-circle"></i> Marked as missed. Weights will deload if you miss 2+ weeks.</div>`;
+  renderCalendar();
+}
+
+function todayStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────
+function updateProgressSelect(){
+  const sel=document.getElementById('progress-ex-select');
+  const current=sel.value;
+  // Gather all exercises logged
+  const exIds=new Set();
+  (DB.sessions||[]).forEach(s=>{ if(s.exercises) Object.keys(s.exercises).forEach(k=>exIds.add(k)); });
+
+  // Build label map from session defs
+  const labelMap={};
+  Object.values(SESSIONS_DEF).forEach(sd=>sd.exercises.forEach(e=>{ labelMap[e.id]=e.n; }));
+
+  let opts='<option value="">— select an exercise —</option>';
+  [...exIds].sort().forEach(id=>{
+    const lbl=labelMap[id]||id;
+    opts+=`<option value="${id}" ${id===current?'selected':''}>${lbl}</option>`;
+  });
+  sel.innerHTML=opts;
+  if(current) renderProgress();
+}
+
+function renderProgress(){
+  const exId=document.getElementById('progress-ex-select').value;
+  if(!exId){ document.getElementById('progress-chart').innerHTML=''; return; }
+
+  const labelMap={};
+  Object.values(SESSIONS_DEF).forEach(sd=>sd.exercises.forEach(e=>{ labelMap[e.id]=e.n; }));
+
+  const points=(DB.sessions||[])
+    .filter(s=>s.exercises&&s.exercises[exId])
+    .map(s=>({ date:s.date, kg:s.exercises[exId].kg, sets:s.exercises[exId].sets||[] }))
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  if(!points.length){
+    document.getElementById('progress-chart').innerHTML='<div class="card" style="text-align:center;color:#aaa;font-size:13px;padding:24px">No data yet for this exercise</div>';
+    return;
+  }
+
+  const maxKg=Math.max(...points.map(p=>p.kg));
+  const minKg=Math.min(...points.map(p=>p.kg));
+  const w=320, h=120, pad=30;
+  const scaleX=i=>(points.length>1?(w-pad*2)*i/(points.length-1):w/2)+pad;
+  const scaleY=kg=>h-pad-(maxKg===minKg?h/2:(kg-minKg)/(maxKg-minKg)*(h-pad*1.5));
+
+  const polyline=points.map((p,i)=>`${scaleX(i)},${scaleY(p.kg)}`).join(' ');
+  const area=`${pad},${h-pad} `+points.map((p,i)=>`${scaleX(i)},${scaleY(p.kg)}`).join(' ')+` ${scaleX(points.length-1)},${h-pad}`;
+
+  const dots=points.map((p,i)=>`<circle cx="${scaleX(i)}" cy="${scaleY(p.kg)}" r="4" fill="#2e7dd1" stroke="#fff" stroke-width="1.5"><title>${p.date}: ${p.kg}kg</title></circle>`).join('');
+
+  // X axis labels (first and last)
+  const xLabels=`
+    <text x="${pad}" y="${h}" font-size="9" fill="#aaa" text-anchor="middle">${points[0].date.slice(5)}</text>
+    ${points.length>1?`<text x="${scaleX(points.length-1)}" y="${h}" font-size="9" fill="#aaa" text-anchor="middle">${points[points.length-1].date.slice(5)}</text>`:''}`;
+
+  const svg=`<svg class="chart-svg" viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;overflow:visible">
+    <defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2e7dd1" stop-opacity="0.18"/><stop offset="100%" stop-color="#2e7dd1" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="${area}" fill="url(#grad)"/>
+    <polyline points="${polyline}" fill="none" stroke="#2e7dd1" stroke-width="2" stroke-linejoin="round"/>
+    ${dots}
+    <text x="${pad}" y="${scaleY(maxKg)-4}" font-size="9" fill="#aaa">${maxKg}kg</text>
+    <text x="${pad}" y="${scaleY(minKg)+12}" font-size="9" fill="#aaa">${minKg}kg</text>
+    ${xLabels}
+  </svg>`;
+
+  const pct=maxKg>minKg?Math.round(((points[points.length-1].kg-points[0].kg)/points[0].kg)*100):0;
+  const pctStr=pct>0?`+${pct}%`:pct<0?`${pct}%`:'—';
+  const pctColor=pct>0?'#2a5008':pct<0?'#701818':'#666';
+
+  document.getElementById('progress-chart').innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div class="card-title" style="font-size:13px">${labelMap[exId]||exId}</div><div class="card-sub">${points.length} session${points.length!==1?'s':''} logged</div></div>
+        <span class="badge b-blue" style="color:${pctColor}">${pctStr} total</span>
+      </div>
+      <div class="chart-wrap">${svg}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;text-align:center">
+        <div><div style="font-size:16px;font-weight:600">${points[0].kg}kg</div><div style="font-size:10px;color:#888">Starting</div></div>
+        <div><div style="font-size:16px;font-weight:600">${points[points.length-1].kg}kg</div><div style="font-size:10px;color:#888">Current</div></div>
+        <div><div style="font-size:16px;font-weight:600">${maxKg}kg</div><div style="font-size:10px;color:#888">Best</div></div>
+      </div>
+    </div>`;
+
+  // History list
+  const histHtml=points.slice().reverse().map(p=>{
+    const completedSets=p.sets.filter(s=>s.completed).length;
+    return `<div class="history-item">
+      <div class="history-date">${p.date.slice(5)}</div>
+      <div class="history-body">
+        <div class="history-title">${p.kg}kg</div>
+        <div class="history-detail">${completedSets}/${p.sets.length} sets completed · ${p.sets.map(s=>s.reps||'?').join(', ')} reps</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('history-list').innerHTML=histHtml||'<div style="font-size:12px;color:#aaa">No history yet</div>';
+}
+
+// ─── CARDIO ──────────────────────────────────────────────────────────────
+const RUN_TYPES = {
+  commute:'Commute', easy:'Easy run', long:'Long run',
+  tempo:'Tempo / intervals', cycle:'Cycle commute'
+};
+
+// Set default date to today on load
+function initRunForm(){
+  document.getElementById('run-date').value = todayStr();
+  // Live pace preview
+  ['run-km','run-mins'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updatePacePreview);
+  });
+}
+
+function updatePacePreview(){
+  const km = parseFloat(document.getElementById('run-km').value);
+  const mins = parseFloat(document.getElementById('run-mins').value);
+  const el = document.getElementById('run-pace-preview');
+  if(km>0 && mins>0){
+    const paceDecimal = mins/km;
+    const paceMins = Math.floor(paceDecimal);
+    const paceSecs = Math.round((paceDecimal-paceMins)*60);
+    el.innerHTML = `<span style="color:#2a5008;font-weight:600">Pace: ${paceMins}:${String(paceSecs).padStart(2,'0')} /km</span> &nbsp;·&nbsp; <span style="color:#888">${(km*1000/mins/60*3.6).toFixed(1)} km/h avg</span>`;
+  } else {
+    el.textContent='';
+  }
+}
+
+function logRun(){
+  const date = document.getElementById('run-date').value;
+  const type = document.getElementById('run-type').value;
+  const km   = parseFloat(document.getElementById('run-km').value);
+  const mins = parseFloat(document.getElementById('run-mins').value);
+  const notes= document.getElementById('run-notes').value.trim();
+
+  if(!date){ alert('Please select a date'); return; }
+  if(!km || km<=0){ alert('Please enter a distance'); return; }
+
+  const run = { date, type, km, mins: mins||null, notes, loggedAt: new Date().toISOString() };
+  if(!DB.runs) DB.runs=[];
+  DB.runs.push(run);
+  saveData(DB);
+
+  // Pace string
+  let paceStr='';
+  if(km>0 && mins>0){
+    const p=mins/km, pm=Math.floor(p), ps=Math.round((p-pm)*60);
+    paceStr=` · ${pm}:${String(ps).padStart(2,'0')}/km pace`;
+  }
+
+  document.getElementById('run-confirm').innerHTML=`<div class="banner ban-green"><i class="ti ti-circle-check"></i> Run saved! ${km}km ${RUN_TYPES[type]}${paceStr}</div>`;
+
+  // Reset form
+  document.getElementById('run-km').value='';
+  document.getElementById('run-mins').value='';
+  document.getElementById('run-notes').value='';
+  document.getElementById('run-pace-preview').textContent='';
+  document.getElementById('run-date').value=todayStr();
+
+  renderRunHistory();
+  renderWeeklyRunSummary();
+  renderCalendar();
+}
+
+function renderWeeklyRunSummary(){
+  const el=document.getElementById('weekly-run-summary');
+  if(!el) return;
+  const runs=DB.runs||[];
+
+  // Get current week Mon–Sun
+  const now=new Date();
+  const dow=now.getDay()===0?6:now.getDay()-1;
+  const weekStart=new Date(now); weekStart.setDate(now.getDate()-dow); weekStart.setHours(0,0,0,0);
+  const weekEnd=new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6); weekEnd.setHours(23,59,59,999);
+
+  const thisWeek=runs.filter(r=>{ const d=new Date(r.date); return d>=weekStart&&d<=weekEnd; });
+  const totalKm=thisWeek.reduce((a,r)=>a+r.km,0);
+  const totalMins=thisWeek.reduce((a,r)=>a+(r.mins||0),0);
+  const target=45; // weekly km target
+
+  const pct=Math.min(100,Math.round((totalKm/target)*100));
+  const barColor=totalKm>=target?'#3a6d10':totalKm>=target*0.7?'#e09020':'#2e7dd1';
+
+  let summary=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+      <div>
+        <span style="font-size:22px;font-weight:700;color:#1a1a1a">${totalKm.toFixed(1)}</span>
+        <span style="font-size:13px;color:#888"> / ${target}km target</span>
+      </div>
+      <span class="badge ${totalKm>=target?'b-green':'b-blue'}">${pct}%</span>
+    </div>
+    <div style="background:#e8e8e0;border-radius:4px;height:7px;overflow:hidden;margin-bottom:10px">
+      <div style="height:7px;border-radius:4px;background:${barColor};width:${pct}%;transition:width .3s"></div>
+    </div>`;
+
+  if(thisWeek.length===0){
+    summary+='<div style="font-size:12px;color:#aaa">No runs logged this week yet.</div>';
+  } else {
+    summary+=thisWeek.map(r=>{
+      let pStr='';
+      if(r.km&&r.mins){ const p=r.mins/r.km,pm=Math.floor(p),ps=Math.round((p-pm)*60); pStr=` · ${pm}:${String(ps).padStart(2,'0')}/km`; }
+      return `<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:0.5px solid #f0f0e8">
+        <span style="color:#666">${r.date.slice(5)} <span class="badge b-green" style="font-size:9px">${RUN_TYPES[r.type]||r.type}</span></span>
+        <span style="font-weight:600">${r.km}km${r.mins?` · ${r.mins}min`:''}${pStr}</span>
+      </div>`;
+    }).join('');
+    if(totalMins>0) summary+=`<div style="font-size:11px;color:#888;margin-top:6px">Total this week: ${totalKm.toFixed(1)}km · ${totalMins} min</div>`;
+  }
+  el.innerHTML=summary;
+}
+
+function renderRunHistory(){
+  const el=document.getElementById('run-history');
+  if(!el) return;
+  const runs=(DB.runs||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15);
+  if(!runs.length){ el.innerHTML='<div style="font-size:12px;color:#aaa">No runs logged yet.</div>'; return; }
+  el.innerHTML=runs.map(r=>{
+    let pStr='';
+    if(r.km&&r.mins){ const p=r.mins/r.km,pm=Math.floor(p),ps=Math.round((p-pm)*60); pStr=` · ${pm}:${String(ps).padStart(2,'0')}/km`; }
+    return `<div class="history-item">
+      <div class="history-date">${r.date.slice(5)}</div>
+      <div class="history-body">
+        <div class="history-title">${r.km}km <span class="badge b-green" style="font-size:9px">${RUN_TYPES[r.type]||r.type}</span></div>
+        <div class="history-detail">${r.mins?r.mins+'min':''} ${pStr} ${r.notes?'· '+r.notes:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── RUNNING PROGRESS CHART ───────────────────────────────────────────────
+function renderRunningChart(){
+  const runs=DB.runs||[];
+  if(!runs.length){
+    document.getElementById('running-weekly-chart').innerHTML='<div class="card" style="text-align:center;color:#aaa;font-size:13px;padding:24px">No runs logged yet — head to the Run tab to log your first session.</div>';
+    document.getElementById('running-history-list').innerHTML='';
+    return;
+  }
+
+  // Group by ISO week
+  const weekMap={};
+  runs.forEach(r=>{
+    const d=new Date(r.date);
+    const wk=`${d.getFullYear()}-W${String(getWeek(d)).padStart(2,'0')}`;
+    if(!weekMap[wk]) weekMap[wk]={wk,km:0,runs:0,mins:0};
+    weekMap[wk].km+=r.km;
+    weekMap[wk].runs++;
+    weekMap[wk].mins+=(r.mins||0);
+  });
+
+  const weeks=Object.values(weekMap).sort((a,b)=>a.wk.localeCompare(b.wk));
+  const maxKm=Math.max(...weeks.map(w=>w.km), 45);
+  const target=45;
+
+  const w=320,h=120,pad=30;
+  const barW=Math.max(8,Math.floor((w-pad*2)/weeks.length)-3);
+  const scaleY=km=>h-pad-(km/maxKm)*(h-pad*1.2);
+  const targetY=scaleY(target);
+
+  const bars=weeks.map((wk,i)=>{
+    const x=pad+(i/Math.max(weeks.length-1,1))*(w-pad*2)-barW/2;
+    const barH=(h-pad)-(scaleY(wk.km));
+    const fill=wk.km>=target?'#3a6d10':wk.km>=target*0.7?'#e09020':'#2e7dd1';
+    return `<rect x="${x}" y="${scaleY(wk.km)}" width="${barW}" height="${barH}" rx="3" fill="${fill}" opacity="0.85"><title>${wk.wk}: ${wk.km.toFixed(1)}km</title></rect>`;
+  }).join('');
+
+  // X labels: first, last, middle
+  const xLabels=[0, Math.floor(weeks.length/2), weeks.length-1].filter((v,i,a)=>a.indexOf(v)===i&&weeks[v]).map(i=>{
+    const x=pad+(i/Math.max(weeks.length-1,1))*(w-pad*2);
+    return `<text x="${x}" y="${h+2}" font-size="8" fill="#aaa" text-anchor="middle">${weeks[i].wk.slice(5)}</text>`;
+  }).join('');
+
+  const svg=`<svg viewBox="0 0 ${w} ${h+12}" xmlns="http://www.w3.org/2000/svg" style="width:100%;overflow:visible">
+    ${bars}
+    <line x1="${pad}" y1="${targetY}" x2="${w-pad+10}" y2="${targetY}" stroke="#d84040" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+    <text x="${w-pad+12}" y="${targetY+3}" font-size="8" fill="#d84040">${target}km</text>
+    <text x="${pad}" y="${scaleY(maxKm)-4}" font-size="8" fill="#aaa">${Math.round(maxKm)}km</text>
+    ${xLabels}
+  </svg>`;
+
+  const totalKm=runs.reduce((a,r)=>a+r.km,0);
+  const avgWeekly=(weeks.length?totalKm/weeks.length:0).toFixed(1);
+  const bestWeek=Math.max(...weeks.map(w=>w.km)).toFixed(1);
+
+  document.getElementById('running-weekly-chart').innerHTML=`
+    <div class="card">
+      <div class="card-title" style="margin-bottom:2px">Weekly km — all time</div>
+      <div class="card-sub" style="margin-bottom:10px">${runs.length} runs · ${totalKm.toFixed(1)}km total</div>
+      <div class="chart-wrap">${svg}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;text-align:center">
+        <div><div style="font-size:16px;font-weight:600">${totalKm.toFixed(0)}km</div><div style="font-size:10px;color:#888">Total</div></div>
+        <div><div style="font-size:16px;font-weight:600">${avgWeekly}km</div><div style="font-size:10px;color:#888">Avg /week</div></div>
+        <div><div style="font-size:16px;font-weight:600">${bestWeek}km</div><div style="font-size:10px;color:#888">Best week</div></div>
+      </div>
+    </div>`;
+
+  // History list
+  const histHtml=runs.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20).map(r=>{
+    let pStr='';
+    if(r.km&&r.mins){ const p=r.mins/r.km,pm=Math.floor(p),ps=Math.round((p-pm)*60); pStr=`${pm}:${String(ps).padStart(2,'0')}/km`; }
+    return `<div class="history-item">
+      <div class="history-date">${r.date.slice(5)}</div>
+      <div class="history-body">
+        <div class="history-title">${r.km}km · <span style="font-weight:400;color:#888">${RUN_TYPES[r.type]||r.type}</span></div>
+        <div class="history-detail">${r.mins?r.mins+'min · ':''} ${pStr} ${r.notes?'· '+r.notes:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('running-history-list').innerHTML=histHtml;
+}
+
+// ─── PROGRESS TAB TOGGLE ─────────────────────────────────────────────────
+function switchProgressTab(tab){
+  document.getElementById('prog-strength').style.display=tab==='strength'?'block':'none';
+  document.getElementById('prog-running').style.display=tab==='running'?'block':'none';
+  document.getElementById('prog-tab-strength').className='btn btn-sm'+(tab==='strength'?' btn-blue':'');
+  document.getElementById('prog-tab-running').className='btn btn-sm';
+  if(tab==='strength'){ document.getElementById('prog-tab-strength').style.cssText='background:#deeefb;color:#0a3a6b;border-color:#2e7dd1'; document.getElementById('prog-tab-running').style.cssText=''; }
+  else { document.getElementById('prog-tab-running').style.cssText='background:#e3f5d8;color:#2a5008;border-color:#5a9e2f'; document.getElementById('prog-tab-strength').style.cssText=''; }
+  if(tab==='running') renderRunningChart();
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────
+function switchTab(t,el){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  document.getElementById('section-'+t).classList.add('active');
+  el.classList.add('active');
+  if(t==='progress'){ updateProgressSelect(); renderProgress(); }
+  if(t==='calendar'){ renderCalendar(); }
+  if(t==='cardio'){ renderRunHistory(); renderWeeklyRunSummary(); }
+}
+
+// ─── SERVICE WORKER REGISTRATION ─────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(err=>console.log('SW error:', err));
+  });
+}
+
+renderSession();
+updateProgressSelect();
+initRunForm();
+</script>
+</body>
+</html>
